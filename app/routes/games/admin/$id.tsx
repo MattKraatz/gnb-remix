@@ -8,7 +8,7 @@ import {
   useParams,
   useTransition,
 } from "@remix-run/react";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import invariant from "tiny-invariant";
 import qs from "qs";
 
@@ -76,7 +76,11 @@ export const action: ActionFunction = async ({ request, params }) => {
     await updateGame(
       { id: Number(params.id), title },
       formData.players?.map((p) => {
-        return { score: Number(p.score), userId: p.userId, id: p.id ?? 0 };
+        return {
+          score: Number(p.score),
+          userId: p.userId,
+          id: Number(p.id) ?? 0,
+        };
       }) ?? []
     );
   } else {
@@ -101,14 +105,18 @@ export default function NewGame() {
 
   const isNew = !game;
 
-  const formPlayers = players ?? [];
-  for (let i = 0; i < newPlayerCount; i++) {
-    formPlayers.push({
-      id: 0,
-      score: 0,
-      userId: "",
-    });
-  }
+  const formPlayers = useMemo(() => {
+    const newPlayers = [];
+    for (let i = 0; i < newPlayerCount; i++) {
+      newPlayers.push({
+        id: 0,
+        score: 0,
+        userId: "",
+      });
+    }
+
+    return [...(players ?? []), ...newPlayers];
+  }, [players, newPlayerCount]);
 
   const transition = useTransition();
   const isCreating = transition.submission?.formData.get("intent") === "create";
@@ -132,29 +140,35 @@ export default function NewGame() {
         </label>
       </p>
       <p>
-        {players?.map((player, i) => (
-          <React.Fragment key={i}>
-            <input
-              type="select"
-              name={`players[${player.id}][id]`}
-              className={inputClassName}
-              defaultValue={player.id}
-            />
-            <input
-              type="select"
-              name={`players[${player.id}][userId]`}
-              className={inputClassName}
-              defaultValue={player.userId}
-            />
-            <input
-              key={player.id}
-              type="number"
-              name={`players[${player.id}][score]`}
-              className={inputClassName}
-              defaultValue={player.score}
-            />
-          </React.Fragment>
-        ))}
+        <label>
+          Players:{" "}
+          {errors?.title ? (
+            <em className="text-red-600">{errors.players}</em>
+          ) : null}
+          {formPlayers?.map((player, i) => (
+            <React.Fragment key={i}>
+              <input
+                type="select"
+                name={`players[${i}][id]`}
+                className={inputClassName}
+                defaultValue={player.id}
+              />
+              <input
+                type="select"
+                name={`players[${i}][userId]`}
+                className={inputClassName}
+                defaultValue={player.userId}
+              />
+              <input
+                key={player.id}
+                type="number"
+                name={`players[${i}][score]`}
+                className={inputClassName}
+                defaultValue={player.score}
+              />
+            </React.Fragment>
+          ))}
+        </label>
       </p>
       <div className="flex justify-end gap-4">
         <button

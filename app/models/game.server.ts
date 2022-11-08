@@ -50,10 +50,14 @@ export async function updateGame(
       players: {
         deleteMany: {
           id: {
-            notIn: players?.map((p) => p.id),
+            notIn: players?.filter((p) => p.id).map((p) => p.id),
           },
         },
-        create: players?.filter((p) => !p.id),
+        create: players
+          ?.filter((p) => p.id === 0)
+          .map((p) => {
+            return { ...p, id: undefined } as unknown as Player;
+          }),
       },
     },
     where: { id: game.id },

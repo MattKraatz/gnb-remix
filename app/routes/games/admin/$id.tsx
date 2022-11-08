@@ -21,24 +21,28 @@ import {
 } from "~/models/game.server";
 import { requireAdminUser } from "~/session.server";
 import React from "react";
+import { getUsers } from "~/models/user.server";
 
 type LoaderData = {
   game?: Game;
   players?: Array<Pick<Player, "id" | "score" | "userId">>;
+  users?: Awaited<ReturnType<typeof getUsers>>;
 };
 
 export const loader: LoaderFunction = async ({ request, params }) => {
   await requireAdminUser(request);
   invariant(params.id, "Id is required");
 
+  const users = await getUsers();
+
   if (params.id === "new") {
-    return json({} as LoaderData);
+    return json({ users } as LoaderData);
   } else {
     const game = await getGame(Number(params.id));
     if (!game) {
       throw new Response("Not Found", { status: 404 });
     }
-    return json({ game, players: game.players } as LoaderData);
+    return json({ game, players: game.players, users } as LoaderData);
   }
 };
 
@@ -79,7 +83,7 @@ export const action: ActionFunction = async ({ request, params }) => {
         return {
           score: Number(p.score),
           userId: p.userId,
-          id: Number(p.id) ?? 0,
+          id: Number(p.id),
         };
       }) ?? []
     );
@@ -87,7 +91,7 @@ export const action: ActionFunction = async ({ request, params }) => {
     await createGame(
       { title },
       formData.players?.map((p) => {
-        return { score: Number(p.score), userId: p.userId };
+        return { score: Number(p.score), userId: p.userId, id: Number(p.id) };
       }) ?? []
     );
   }
@@ -95,10 +99,8 @@ export const action: ActionFunction = async ({ request, params }) => {
   return redirect("/games/admin");
 };
 
-const inputClassName = `w-full rounded border border-gray-500 px-2 py-1 text-lg`;
-
-export default function NewGame() {
-  const { game, players } = useLoaderData<LoaderData>();
+export default function GameForm() {
+  const { game, players, users } = useLoaderData<LoaderData>();
   const errors = useActionData();
 
   const [newPlayerCount, setNewPlayerCount] = useState<number>(0);
@@ -125,51 +127,65 @@ export default function NewGame() {
 
   return (
     <Form method="post" key={game?.id ?? "new"}>
-      <p>
-        <label>
-          Game Title:{" "}
-          {errors?.title ? (
-            <em className="text-red-600">{errors.title}</em>
-          ) : null}
-          <input
-            type="text"
-            name="title"
-            className={inputClassName}
-            defaultValue={game?.title}
-          />
-        </label>
-      </p>
-      <p>
-        <label>
-          Players:{" "}
-          {errors?.title ? (
-            <em className="text-red-600">{errors.players}</em>
-          ) : null}
+      <div className="-mx-3 flex flex-wrap">
+        <div className="w-full px-3">
+          <div className="mb-5">
+            <label className="mb-3 block text-base font-medium text-[#07074D]">
+              Game Title:{" "}
+              {errors?.title ? (
+                <em className="text-red-600">{errors.title}</em>
+              ) : null}
+            </label>
+            <input
+              type="text"
+              name="title"
+              className="w-full rounded-md border border-[#e0e0e0] bg-white py-3 px-6 text-base font-medium text-[#6B7280] outline-none focus:border-[#6A64F1] focus:shadow-md"
+              defaultValue={game?.title}
+            />
+          </div>
+        </div>
+        <div className="w-full px-3">
+          <label className="mb-3 block text-base font-medium text-[#07074D]">
+            Players:{" "}
+            {errors?.title ? (
+              <em className="text-red-600">{errors.players}</em>
+            ) : null}
+          </label>
           {formPlayers?.map((player, i) => (
-            <React.Fragment key={i}>
+            <div className="mb-2 flex w-full" key={i}>
               <input
-                type="select"
+                type="number"
                 name={`players[${i}][id]`}
-                className={inputClassName}
+                className="hidden"
                 defaultValue={player.id}
               />
-              <input
-                type="select"
-                name={`players[${i}][userId]`}
-                className={inputClassName}
-                defaultValue={player.userId}
-              />
-              <input
-                key={player.id}
-                type="number"
-                name={`players[${i}][score]`}
-                className={inputClassName}
-                defaultValue={player.score}
-              />
-            </React.Fragment>
+              <div className="w-2/3">
+                <span className="mr-6 w-1/6">{i + 1}.</span>
+                <select
+                  name={`players[${i}][userId]`}
+                  defaultValue={player.userId}
+                  className="w-5/6 rounded-md border border-[#e0e0e0] bg-white py-3 px-6 text-base font-medium text-[#6B7280] outline-none focus:border-[#6A64F1] focus:shadow-md"
+                >
+                  <option value=""></option>
+                  {users?.map((u) => (
+                    <option value={u.id} key={u.id}>
+                      {u.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <div className="w-1/3 px-4">
+                <input
+                  type="number"
+                  name={`players[${i}][score]`}
+                  className="w-full rounded-md border border-[#e0e0e0] bg-white py-3 px-6 text-base font-medium text-[#6B7280] outline-none focus:border-[#6A64F1] focus:shadow-md"
+                  defaultValue={player.score}
+                />
+              </div>
+            </div>
           ))}
-        </label>
-      </p>
+        </div>
+      </div>
       <div className="flex justify-end gap-4">
         <button
           type="button"

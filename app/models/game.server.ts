@@ -54,9 +54,9 @@ export async function updateGame(
           },
         },
         create: players
-          ?.filter((p) => p.id === 0)
+          ?.filter((p) => p.id === 0) // new players
           .map((p) => {
-            return { ...p, id: undefined } as unknown as Player;
+            return { ...p, id: undefined };
           }),
       },
     },

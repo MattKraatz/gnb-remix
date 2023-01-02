@@ -20,7 +20,6 @@ import {
   updateGame,
 } from "~/models/game.server";
 import { requireAdminUser } from "~/session.server";
-import React from "react";
 import { getUsers } from "~/models/user.server";
 
 type LoaderData = {
@@ -61,7 +60,7 @@ export const action: ActionFunction = async ({ request, params }) => {
 
   if (formData?.intent === "delete") {
     await deleteGame(Number(params.id));
-    return redirect("/games/admin");
+    return redirect("/app/games");
   }
 
   const title = formData.title;
@@ -91,12 +90,12 @@ export const action: ActionFunction = async ({ request, params }) => {
     await createGame(
       { title },
       formData.players?.map((p) => {
-        return { score: Number(p.score), userId: p.userId, id: Number(p.id) };
+        return { score: Number(p.score), userId: p.userId };
       }) ?? []
     );
   }
 
-  return redirect("/games/admin");
+  return redirect("/app/games");
 };
 
 export default function GameForm() {
@@ -212,7 +211,7 @@ export default function GameForm() {
           className="rounded bg-blue-500 py-2 px-4 text-white hover:bg-blue-600 focus:bg-blue-400 disabled:bg-blue-300"
           disabled={isCreating || isUpdating}
         >
-          {isNew ? (isCreating ? "Creating..." : "New Game") : null}
+          {isNew ? (isCreating ? "Creating..." : "Save Game") : null}
           {isNew ? null : isUpdating ? "Updating..." : "Update Game"}
         </button>
       </div>

@@ -13,29 +13,61 @@ async function seed() {
 
   const hashedPassword = await bcrypt.hash("strongpassword", 10);
 
-  const user = await prisma.user.create({
-    data: {
-      email,
-      name: "Matt Kraatz",
-      password: {
-        create: {
-          hash: hashedPassword,
+  const users = [];
+
+  users.push(
+    await prisma.user.create({
+      data: {
+        email,
+        name: "Matt Kraatz",
+        password: {
+          create: {
+            hash: hashedPassword,
+          },
         },
       },
-    },
-  });
+    })
+  );
+
+  users.push(
+    await prisma.user.create({
+      data: {
+        email: "fake1@fake.com",
+        name: "Jane Doe",
+        password: {
+          create: {
+            hash: hashedPassword,
+          },
+        },
+      },
+    })
+  );
+
+  users.push(
+    await prisma.user.create({
+      data: {
+        email: "fake2@fake.com",
+        name: "John Doe",
+        password: {
+          create: {
+            hash: hashedPassword,
+          },
+        },
+      },
+    })
+  );
 
   const game = await prisma.game.create({
     data: {
       title: "Solitaire",
-    },
-  });
-
-  await prisma.player.create({
-    data: {
-      score: 5,
-      gameId: game.id,
-      userId: user.id,
+      players: {
+        create: users.map((u) => {
+          return {
+            score: 5,
+            userId: u.id,
+          };
+        }),
+      },
     },
   });
 

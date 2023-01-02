@@ -6,6 +6,19 @@ export type { Game, Player };
 export async function getGames() {
   return prisma.game.findMany({
     include: gameIncludes,
+    orderBy: {
+      createdAt: "desc",
+    },
+  });
+}
+
+export async function getRecentGames() {
+  return prisma.game.findMany({
+    take: 5,
+    include: gameIncludes,
+    orderBy: {
+      createdAt: "desc",
+    },
   });
 }
 

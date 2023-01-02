@@ -21,10 +21,7 @@ export default function Index() {
               <div className="mx-auto mt-10 max-w-sm sm:flex sm:max-w-none sm:justify-center">
                 {user ? (
                   <div className="mx-auto max-w-7xl text-center">
-                    <Link
-                      to="/games"
-                      className="text-xl text-blue-600 underline"
-                    >
+                    <Link to="/app" className="text-xl text-blue-600 underline">
                       Get Started
                     </Link>
                   </div>

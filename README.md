@@ -40,13 +40,17 @@ Not a fan of bits of the stack? Fork it, change it, and use `npx create-remix --
   npm run setup
   ```
 
-- Start dev server:
+- Start dev server: _This starts your app in development mode, rebuilding assets on file changes_
 
   ```sh
   npm run dev
   ```
 
-This starts your app in development mode, rebuilding assets on file changes.
+- Migrate Prisma schema changes: _This creates a migration and applies it to your dev database_
+
+```sh
+npx migrate dev --name {name_of_migration}
+```
 
 ## Deployment
 

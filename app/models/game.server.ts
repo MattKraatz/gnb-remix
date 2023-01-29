@@ -37,25 +37,32 @@ const gameIncludes = {
   },
 };
 
-export async function createGame(
-  game: Pick<Game, "title">,
-  players: Array<Pick<Player, "score" | "userId">>
-) {
+export async function createGame(game: Pick<Game, "title">) {
   return prisma.game.create({
     data: {
       title: game.title,
-      players: {
-        create: players,
-      },
     },
     include: gameIncludes,
   });
 }
 
-export async function updateGame(
-  game: Pick<Game, "id" | "title">,
-  players: Array<Pick<Player, "id" | "score" | "userId">>
-) {
+export async function createPlayer(gameId: number) {
+  return prisma.player.create({
+    data: {
+      gameId: gameId,
+    },
+  });
+}
+
+export async function deletePlayer(playerId: number) {
+  return prisma.player.delete({
+    where: {
+      id: playerId,
+    },
+  });
+}
+
+export async function updateGame(game: Pick<Game, "id" | "title">, players: Array<Pick<Player, "id" | "score" | "userId">>) {
   var dbGame = await prisma.game.update({
     data: {
       title: game.title,

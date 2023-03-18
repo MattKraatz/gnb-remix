@@ -1,8 +1,10 @@
-import { Link, Outlet } from "@remix-run/react";
-import { HomeIcon, BackpackIcon, InfoCircledIcon } from "@radix-ui/react-icons";
+import { Link, Outlet, useLocation } from "@remix-run/react";
+import { HomeIcon, BackpackIcon, InfoCircledIcon, PersonIcon } from "@radix-ui/react-icons";
 import * as NavigationMenu from "@radix-ui/react-navigation-menu";
 
 export default function App() {
+  const location = useLocation();
+
   return (
     <div className="mx-auto h-screen max-w-4xl bg-white py-1 px-3">
       <h1 className="my-2 border-b-2 border-blue-200 border-opacity-40 text-center text-3xl font-extrabold tracking-tight">
@@ -14,20 +16,49 @@ export default function App() {
         <NavigationMenu.Root>
           <NavigationMenu.List className="mt-8 divide-y divide-blue-100 px-4">
             <NavigationMenu.Item>
-              <NavigationMenu.Link className="items-middle my-4 block uppercase leading-none text-gray-500" href="/app">
+              <NavigationMenu.Link
+                className={
+                  "items-middle my-4 block uppercase leading-none text-gray-500 " + (location.pathname === "/app" ? "font-bold" : "")
+                }
+                href="/app"
+              >
                 <HomeIcon aria-hidden className="relative mr-3 inline" style={{ top: "-1px" }} />
                 Home
               </NavigationMenu.Link>
             </NavigationMenu.Item>
             <NavigationMenu.Item>
-              <NavigationMenu.Link className="items-middle my-4 block uppercase leading-none text-gray-500" href="/app/games">
+              <NavigationMenu.Link
+                className={
+                  "items-middle my-4 block uppercase leading-none text-gray-500 " +
+                  (location.pathname.startsWith("/app/games") ? "font-bold" : "")
+                }
+                href="/app/games"
+              >
                 <BackpackIcon aria-hidden className="relative mr-3 inline" style={{ top: "-1px" }} />
                 Games
               </NavigationMenu.Link>
             </NavigationMenu.Item>
             <NavigationMenu.Item>
-              <NavigationMenu.Link className="items-middle my-4 block uppercase leading-none text-gray-500" href="/app/about">
-                <InfoCircledIcon aria-hidden className="relative mr-3 inline" style={{ top: "-1px" }} />
+              <NavigationMenu.Link
+                className={
+                  "items-middle my-4 block uppercase leading-none text-gray-500 " +
+                  (location.pathname.startsWith("/app/players") ? "font-bold" : "")
+                }
+                href="/app/players"
+              >
+                <PersonIcon aria-hidden className="relative mr-3 inline" style={{ top: "-2px" }} />
+                Players
+              </NavigationMenu.Link>
+            </NavigationMenu.Item>
+            <NavigationMenu.Item>
+              <NavigationMenu.Link
+                className={
+                  "items-middle my-4 block uppercase leading-none text-gray-500 " +
+                  (location.pathname.startsWith("/app/about") ? "font-bold" : "")
+                }
+                href="/app/about"
+              >
+                <InfoCircledIcon aria-hidden className="relative mr-3 inline" style={{ top: "-2px" }} />
                 About
               </NavigationMenu.Link>
             </NavigationMenu.Item>

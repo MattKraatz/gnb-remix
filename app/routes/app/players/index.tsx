@@ -1,8 +1,10 @@
+import PageHeader from "~/components/header";
+
 export default function PlayersIndex() {
   return (
     <>
-      <h2>Players</h2>
-      <span>Under construction</span>
+      <PageHeader>Players</PageHeader>
+      <p>Under construction</p>
     </>
   );
 }

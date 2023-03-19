@@ -1,5 +1,9 @@
-import { json, LoaderFunction } from "@remix-run/node";
+import { PlusCircledIcon } from "@radix-ui/react-icons";
+import type { LoaderFunction } from "@remix-run/node";
+import { json } from "@remix-run/node";
 import { Link, useLoaderData } from "@remix-run/react";
+import GameList from "~/components/gameList";
+import PageHeader from "~/components/header";
 import { getRecentGames } from "~/models/game.server";
 
 type LoaderData = {
@@ -15,25 +19,12 @@ export default function GamesIndex() {
 
   return (
     <>
-      <h2>Recent Games</h2>
-      <ul>
-        {games.map((game) => (
-          <li key={game.id}>
-            <Link
-              to={`games/${game.id.toString()}`}
-              className="text-blue-600 underline"
-            >
-              {game.title}
-            </Link>
-          </li>
-        ))}
-        <hr />
-        <li>
-          <Link to="games/new" className="text-blue-600 underline">
-            Create a New Game
-          </Link>
-        </li>
-      </ul>
+      <PageHeader>Recent Games</PageHeader>
+      <GameList games={games} />
+      <Link to="games/new" className="float-right text-blue-600">
+        <PlusCircledIcon className="relative mr-1 inline" style={{ top: "-2px" }} />
+        Create a New Game
+      </Link>
     </>
   );
 }

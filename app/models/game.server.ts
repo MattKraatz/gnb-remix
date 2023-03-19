@@ -1,7 +1,16 @@
 import { prisma } from "~/db.server";
 
 import type { Game, Player } from "@prisma/client";
-export type { Game, Player };
+
+type GameWithPlayers = StringifyDates<Game> & {
+  players: Array<StringifyDates<Player>>;
+};
+
+type StringifyDates<T> = {
+  [k in keyof T]: T[k] extends Date ? string : T[k];
+};
+
+export type { Game, Player, GameWithPlayers };
 
 export async function getGames() {
   return prisma.game.findMany({

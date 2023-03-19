@@ -1,40 +1,70 @@
-import type { LoaderFunction } from "@remix-run/node";
-import { json } from "@remix-run/node";
-import { Link, useLoaderData, Outlet } from "@remix-run/react";
-
-import { getGames } from "~/models/game.server";
-
-type LoaderData = {
-  games: Awaited<ReturnType<typeof getGames>>;
-};
-
-export const loader: LoaderFunction = async ({ request }) => {
-  return json({ games: await getGames() });
-};
+import { Link, Outlet, useLocation } from "@remix-run/react";
+import { HomeIcon, BackpackIcon, InfoCircledIcon, PersonIcon } from "@radix-ui/react-icons";
+import * as NavigationMenu from "@radix-ui/react-navigation-menu";
 
 export default function App() {
-  const { games } = useLoaderData<LoaderData>();
+  const location = useLocation();
+
   return (
-    <div className="mx-auto max-w-4xl">
-      <h1 className="my-6 mb-2 border-b-2 text-center text-3xl">
-        <Link to="/">Game Night Buddy</Link>
+    <div className="mx-auto h-screen max-w-4xl bg-white py-1 px-3">
+      <h1 className="my-2 border-b-2 border-blue-200 border-opacity-40 text-center text-3xl font-extrabold tracking-tight">
+        <span className="block pt-2 pb-4 uppercase text-blue-500 drop-shadow-md">
+          <Link to="/">Game Night Buddy</Link>
+        </span>
       </h1>
       <div className="grid grid-cols-4 gap-6">
-        <nav className="col-span-4 md:col-span-1">
-          <ul>
-            <li>
-              <Link to={"/app"} className="text-blue-600 underline">
+        <NavigationMenu.Root>
+          <NavigationMenu.List className="mt-8 divide-y divide-blue-100 px-4">
+            <NavigationMenu.Item>
+              <NavigationMenu.Link
+                className={
+                  "items-middle my-4 block uppercase leading-none text-gray-500 " + (location.pathname === "/app" ? "font-bold" : "")
+                }
+                href="/app"
+              >
+                <HomeIcon aria-hidden className="relative mr-3 inline" style={{ top: "-1px" }} />
                 Home
-              </Link>
-            </li>
-            <li>
-              <Link to={"/app/games"} className="text-blue-600 underline">
+              </NavigationMenu.Link>
+            </NavigationMenu.Item>
+            <NavigationMenu.Item>
+              <NavigationMenu.Link
+                className={
+                  "items-middle my-4 block uppercase leading-none text-gray-500 " +
+                  (location.pathname.startsWith("/app/games") ? "font-bold" : "")
+                }
+                href="/app/games"
+              >
+                <BackpackIcon aria-hidden className="relative mr-3 inline" style={{ top: "-1px" }} />
                 Games
-              </Link>
-            </li>
-          </ul>
-        </nav>
-        <main className="col-span-4 md:col-span-3">
+              </NavigationMenu.Link>
+            </NavigationMenu.Item>
+            <NavigationMenu.Item>
+              <NavigationMenu.Link
+                className={
+                  "items-middle my-4 block uppercase leading-none text-gray-500 " +
+                  (location.pathname.startsWith("/app/players") ? "font-bold" : "")
+                }
+                href="/app/players"
+              >
+                <PersonIcon aria-hidden className="relative mr-3 inline" style={{ top: "-2px" }} />
+                Players
+              </NavigationMenu.Link>
+            </NavigationMenu.Item>
+            <NavigationMenu.Item>
+              <NavigationMenu.Link
+                className={
+                  "items-middle my-4 block uppercase leading-none text-gray-500 " +
+                  (location.pathname.startsWith("/app/about") ? "font-bold" : "")
+                }
+                href="/app/about"
+              >
+                <InfoCircledIcon aria-hidden className="relative mr-3 inline" style={{ top: "-2px" }} />
+                About
+              </NavigationMenu.Link>
+            </NavigationMenu.Item>
+          </NavigationMenu.List>
+        </NavigationMenu.Root>
+        <main className="col-span-4 p-4 md:col-span-3">
           <Outlet />
         </main>
       </div>
